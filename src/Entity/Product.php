@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use DateTimeInterface;
+use Money\Currency;
+use Money\Money;
+use Money\UnknownCurrencyException;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,9 +13,6 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use Money\Currency;
-use Money\Money;
-use Money\UnknownCurrencyException;
 
 /**
  * @ApiResource(
