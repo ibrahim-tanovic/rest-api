@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ApiResource(
@@ -23,8 +25,23 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "put",
  *          "patch",
  *          "delete"
+ *     },
+ *     attributes={
+ *          "pagination_items_per_page"=3
  *     }
  * )
+ * @ApiFilter(OrderFilter::class,
+ *     properties={
+ *          "id",
+ *          "name",
+ *          "price",
+ *          "rating": "DESC",
+ *          "updatedAt": {
+ *              "nulls_comparison": OrderFilter::NULLS_SMALLEST,
+ *              "default_direction": "DESC"
+ *          }
+ *     },
+ *     arguments={"orderParameterName"="orderBy"})
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
 class Product
@@ -57,7 +74,7 @@ class Product
      * Rating of product between 0.0 and 5.0
      *
      * @ORM\Column(type="float")
-     * @Groups({"products:item:read"})
+     * @Groups({"products:item:read", "products:read"})
      * @Assert\NotNull()
      * @Assert\Range(min=0, max=5)
      */
