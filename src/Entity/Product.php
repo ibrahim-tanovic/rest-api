@@ -9,6 +9,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Money\Currency;
+use Money\Money;
+use Money\UnknownCurrencyException;
 
 /**
  * @ApiResource(
@@ -43,9 +46,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          }
  *     },
  *     arguments={"orderParameterName"="orderBy"})
- * @ApiFilter(SearchFilter::class, properties={
- *     "name": "partial"
- * })
+ * @ApiFilter(SearchFilter::class,
+ *     properties={"name": "partial"})
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
 class Product
@@ -120,6 +122,27 @@ class Product
         return $this->price;
     }
 
+    /**
+     * Price in requested currency (Header name: X-Requested-Currency)
+     *
+     * @Groups({"products:item:read", "products:read"})
+     * @throws UnknownCurrencyException
+     */
+    public function getCustomCurrencyPrice(): int
+    {
+        if (isset($_SERVER['HTTP_X_REQUESTED_CURRENCY'])) {
+            $currencyCode = $_SERVER['HTTP_X_REQUESTED_CURRENCY'];
+            if (!empty($currencyCode)) {
+                $money = new Money($this->price, new Currency($currencyCode));
+                return $money->getAmount();
+            } else {
+                return $this->price;
+            }
+        } else {
+            return 0;
+        }
+    }
+
     public function setPrice(int $price): self
     {
         $this->price = $price;
@@ -139,12 +162,12 @@ class Product
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    public function setUpdatedAt(?DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 
