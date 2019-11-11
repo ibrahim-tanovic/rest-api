@@ -4,10 +4,27 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     normalizationContext={
+ *          "groups"={"products:read"},
+ *          "swagger_definition_name"="Listing"
+ *     },
+ *     itemOperations={
+ *          "get"={
+ *              "normalization_context"={
+ *                  "groups"={"products:item:read"},
+ *                  "swagger_definition_name"="Single"
+ *              },
+ *          },
+ *          "put",
+ *          "patch",
+ *          "delete"
+ *     }
+ * )
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
 class Product
@@ -16,11 +33,13 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"products:item:read", "products:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"products:item:read", "products:read"})
      * @Assert\NotBlank()
      */
     private $name;
@@ -29,24 +48,30 @@ class Product
      * Price of product in USD cents
      *
      * @ORM\Column(type="integer")
-     * @Assert\NotBlank()
+     * @Groups({"products:item:read", "products:read"})
+     * @Assert\NotNull()
      */
     private $price;
 
     /**
+     * Rating of product between 0.0 and 5.0
+     *
      * @ORM\Column(type="float")
-     * @Assert\NotBlank()
+     * @Groups({"products:item:read"})
+     * @Assert\NotNull()
      * @Assert\Range(min=0, max=5)
      */
     private $rating;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"products:item:read"})
      */
     private $updatedAt;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"products:item:read"})
      */
     private $color;
 
