@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
@@ -42,6 +43,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          }
  *     },
  *     arguments={"orderParameterName"="orderBy"})
+ * @ApiFilter(SearchFilter::class, properties={
+ *     "name": "partial"
+ * })
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
 class Product
@@ -55,6 +59,8 @@ class Product
     private $id;
 
     /**
+     * Product name
+     *
      * @ORM\Column(type="string", length=255)
      * @Groups({"products:item:read", "products:read"})
      * @Assert\NotBlank()
